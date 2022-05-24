@@ -65,13 +65,14 @@ def parse_opt():
     parser.add_argument('--workers', default=0, type=int)
     parser.add_argument('--scheduler', default='Cosine')
     parser.add_argument('--step_size', default=10)
+    parser.add_argument('--T_max', default=20)
 
 
     args = parser.parse_args()
     return args
 
 
-def get_scheduler(optimizer, type, step_size):
+def get_scheduler(optimizer, type, step_size, T_max):
     scheduler = None
     if type not in ['StepLR', 'Cosine']:
         raise (ValueError, 'only support StepLR, Cosine')
@@ -113,7 +114,7 @@ if __name__ == '__main__':
     model = model.cuda()
     loss_fn = CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=learn_rate)
-    scheduler = get_scheduler(optimizer, type=args.scheduler, step_size=args.step_size)
+    scheduler = get_scheduler(optimizer, type=args.scheduler, step_size=args.step_size, T_max=args.T_max)
 
     train_loader = DataLoader(train_data, batch_size=train_batch, shuffle=True, num_workers=args.workers,
                               drop_last=False)

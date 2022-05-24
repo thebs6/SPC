@@ -66,6 +66,8 @@ def parse_opt():
     parser.add_argument('--scheduler', default='Cosine')
     parser.add_argument('--step_size', default=10)
     parser.add_argument('--T_max', default=20)
+    parser.add_argument('--model', default='resnet18')
+    parser.add_argument('--pretrain', default=False)
 
 
     args = parser.parse_args()
@@ -109,7 +111,10 @@ if __name__ == '__main__':
     train_batch = args.t_batch
     valid_batch = args.v_batch
     min_loss = 5
-    model = torchvision.models.resnet18()
+    if args.model == 'resnet18':
+        model = torchvision.models.resnet18(args.pretrain)
+    elif args.model == 'resnet50':
+        model = torchvision.models.resnet50(args.pretrain)
     model.fc = torch.nn.Linear(model.fc.in_features, len(train_data.classes))
     model = model.cuda()
     loss_fn = CrossEntropyLoss()

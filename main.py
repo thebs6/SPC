@@ -1,4 +1,5 @@
 import argparse
+import os.path
 
 import torch
 import torchvision
@@ -96,9 +97,6 @@ if __name__ == '__main__':
         tf.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
 
-    # train_data = ImageFolder(r'D:\Study\fly\experiments\crowl_ps_using/train', transform=train_transform)
-    # test_data = ImageFolder(r'D:\Study\fly\experiments\crowl_ps_using/test', transform=valid_transform)
-    # valid_data = ImageFolder(r'D:\Study\fly\experiments\crowl_ps_using/valid', transform=valid_transform)
 
     train_data = PDataSet(args, args.init_csv, 'train', transform=train_transform)
     valid_data = PDataSet(args, args.init_csv, 'valid', transform=valid_transform)
@@ -137,4 +135,6 @@ if __name__ == '__main__':
 
         if epoch_loss < min_loss:
             min_loss = epoch_loss
+            if not os.path.exists(args.model_folder):
+                os.mkdir(args.model_folder)
             torch.save(model, f'{args.model_folder}/model_' + str(epoch) + ".pth")

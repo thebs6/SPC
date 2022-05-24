@@ -60,7 +60,7 @@ def parse_opt():
     parser.add_argument('--t_batch', default=64, type=int)
     parser.add_argument('--v_batch', default=64, type=int)
     parser.add_argument('--image_size', default=224, type=int)
-    parser.add_argument('--lr', default=0.01, type=int)
+    parser.add_argument('--lr', default=0.01, type=float)
     parser.add_argument('--model_folder', default='./model')
     parser.add_argument('--workers', default=0, type=int)
     parser.add_argument('--scheduler', default='Cosine')

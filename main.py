@@ -72,6 +72,7 @@ def parse_opt():
     parser.add_argument('--optimizer', default='SGD')
     parser.add_argument('--freeze', default=True)
     parser.add_argument('--model_mode', default=0, type=int)
+    parser.add_argument('--account', type=str)
 
     args = parser.parse_args()
     return args
@@ -104,7 +105,7 @@ def unfreeze_model(model):
 if __name__ == '__main__':
     args = parse_opt()
     wandb.init(project='SPC', config=vars(args))
-    wandb.run.name = f"epoch:{args.epoch}_trainb_{args.t_batch}_validb_{args.v_batch}_lr_{args.lr}_scheduler_{args.scheduler}"
+    wandb.run.name = f"epoch:{args.epoch}_trainb_{args.t_batch}_validb_{args.v_batch}_lr_{args.lr}_scheduler_{args.scheduler}+_account{args.account}"
     train_transform = tf.Compose([
         tf.RandomResizedCrop(args.image_size),
         tf.RandomHorizontalFlip(),

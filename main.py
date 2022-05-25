@@ -71,7 +71,7 @@ def parse_opt():
     parser.add_argument('--pretrain', default=False)
     parser.add_argument('--optimizer', default='SGD')
     parser.add_argument('--freeze', default=True)
-    parser.add_argument('--model_mode', default=0)
+    parser.add_argument('--model_mode', default=0, type=int)
 
     args = parser.parse_args()
     return args

@@ -70,6 +70,7 @@ def parse_opt():
     parser.add_argument('--model', default='resnet18')
     parser.add_argument('--pretrain', default=False)
     parser.add_argument('--optimizer', default='SGD')
+    parser.add_argument('--freeze', default=True)
 
     args = parser.parse_args()
     return args
@@ -122,8 +123,8 @@ if __name__ == '__main__':
         model = torchvision.models.resnet18(args.pretrain)
     elif args.model == 'resnet50':
         model = torchvision.models.resnet50(args.pretrain)
-
-    model = freeze_model(model)
+    if args.freeze:
+        model = freeze_model(model)
     model.fc = torch.nn.Sequential(
         nn.Linear(model.fc.in_features, 256),
         nn.ReLU(),

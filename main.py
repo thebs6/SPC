@@ -12,6 +12,7 @@ from tqdm import tqdm
 from datetime import datetime
 from PDataSet import PDataSet
 import wandb
+from torch import nn
 
 TIMESTAMP = "{0:%Y-%m-%dT%H-%M-%S/}".format(datetime.now())
 
@@ -68,7 +69,7 @@ def parse_opt():
     parser.add_argument('--T_max', default=20)
     parser.add_argument('--model', default='resnet18')
     parser.add_argument('--pretrain', default=False)
-
+    parser.add_argument('--optimizer', default='SGD')
 
     args = parser.parse_args()
     return args
@@ -86,9 +87,16 @@ def get_scheduler(optimizer, type, step_size, T_max):
     return scheduler
 
 
+def freeze_model(model):
+    for param in model.parameters():
+        param.requires_grad = False
+    return model
+
+
 if __name__ == '__main__':
     args = parse_opt()
     wandb.init(project='SPC', config=vars(args))
+    wandb.run.name = f"epoch:{args.epoch}_trainb_{args.t_batch}_validb_{args.v_batch}_lr_{args.lr}_scheduler_{args.scheduler}"
     train_transform = tf.Compose([
         tf.RandomResizedCrop(args.image_size),
         tf.RandomHorizontalFlip(),
@@ -102,7 +110,6 @@ if __name__ == '__main__':
         tf.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
 
-
     train_data = PDataSet(args, args.init_csv, 'train', transform=train_transform)
     valid_data = PDataSet(args, args.init_csv, 'valid', transform=valid_transform)
 
@@ -115,10 +122,21 @@ if __name__ == '__main__':
         model = torchvision.models.resnet18(args.pretrain)
     elif args.model == 'resnet50':
         model = torchvision.models.resnet50(args.pretrain)
-    model.fc = torch.nn.Linear(model.fc.in_features, len(train_data.classes))
+
+    model = freeze_model(model)
+    model.fc = torch.nn.Sequential(
+        nn.Linear(model.fc.in_features, 256),
+        nn.ReLU(),
+        nn.Dropout(0.4),
+        nn.Linear(256, len(train_data.classes)),
+        nn.LogSoftmax(dim=1)
+    )
     model = model.cuda()
     loss_fn = CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=learn_rate)
+    if args.optimizer == 'SGD':
+        optimizer = torch.optim.SGD(model.parameters(), lr=learn_rate)
+    elif args.optimizer == 'Adam':
+        optimizer = torch.optim.Adam(model.parameters(), lr=learn_rate)
     scheduler = get_scheduler(optimizer, type=args.scheduler, step_size=args.step_size, T_max=args.T_max)
 
     train_loader = DataLoader(train_data, batch_size=train_batch, shuffle=True, num_workers=args.workers,

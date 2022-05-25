@@ -71,6 +71,7 @@ def parse_opt():
     parser.add_argument('--pretrain', default=False)
     parser.add_argument('--optimizer', default='SGD')
     parser.add_argument('--freeze', default=True)
+    parser.add_argument('--model_mode', default=0)
 
     args = parser.parse_args()
     return args
@@ -92,6 +93,7 @@ def freeze_model(model):
     for param in model.parameters():
         param.requires_grad = False
     return model
+
 
 def unfreeze_model(model):
     for param in model.parameters():
@@ -130,13 +132,17 @@ if __name__ == '__main__':
         model = torchvision.models.resnet50(args.pretrain)
     if args.freeze:
         model = freeze_model(model)
-    model.fc = torch.nn.Sequential(
-        nn.Linear(model.fc.in_features, 256),
-        nn.ReLU(),
-        nn.Dropout(0.4),
-        nn.Linear(256, len(train_data.classes)),
-        nn.LogSoftmax(dim=1)
-    )
+
+    if args.model_mode == 0:
+        model.fc = torch.nn.Linear(model.fc.in_features, len(train_data.classes))
+    elif args.model_mode == 1:
+        model.fc = torch.nn.Sequential(
+            nn.Linear(model.fc.in_features, 256),
+            nn.ReLU(),
+            nn.Dropout(0.4),
+            nn.Linear(256, len(train_data.classes)),
+            nn.LogSoftmax(dim=1)
+        )
     model = model.cuda()
     loss_fn = CrossEntropyLoss()
     if args.optimizer == 'SGD':
@@ -152,7 +158,7 @@ if __name__ == '__main__':
                               drop_last=False)
 
     for epoch in tqdm(range(1, epoch_num + 1), position=0):
-        if args.freeze and epoch == epoch_num // 2 :
+        if args.freeze and epoch == epoch_num // 2:
             model = unfreeze_model(model)
         train_accuracy, epoch_loss = train_epoch(epoch, train_loader, model, loss_fn)
         scheduler.step()

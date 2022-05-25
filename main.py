@@ -16,7 +16,7 @@ from torch import nn
 
 TIMESTAMP = "{0:%Y-%m-%dT%H-%M-%S/}".format(datetime.now())
 
-api_key = '8b29424df171655b6d4ca44635ce69293298bb93'
+api_key = '00f7f722b448e3badcd722a4d7d9f54a4493af68'
 wandb.login(key=api_key)
 
 

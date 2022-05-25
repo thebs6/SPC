@@ -64,8 +64,8 @@ def parse_opt():
     parser.add_argument('--lr', default=0.01, type=float)
     parser.add_argument('--model_folder', default='./model')
     parser.add_argument('--workers', default=0, type=int)
-    parser.add_argument('--scheduler', default='Cosine')
-    parser.add_argument('--step_size', default=10)
+    parser.add_argument('--scheduler', default='StepLR')
+    parser.add_argument('--step_size', default=15, type=int)
     parser.add_argument('--T_max', default=20)
     parser.add_argument('--model', default='resnet18')
     parser.add_argument('--pretrain', default=False)
@@ -96,8 +96,8 @@ def freeze_model(model):
 
 if __name__ == '__main__':
     args = parse_opt()
-    wandb.init(project='SPC', config=vars(args))
-    wandb.run.name = f"epoch:{args.epoch}_trainb_{args.t_batch}_validb_{args.v_batch}_lr_{args.lr}_scheduler_{args.scheduler}"
+    # wandb.init(project='SPC', config=vars(args))
+    # wandb.run.name = f"epoch:{args.epoch}_trainb_{args.t_batch}_validb_{args.v_batch}_lr_{args.lr}_scheduler_{args.scheduler}"
     train_transform = tf.Compose([
         tf.RandomResizedCrop(args.image_size),
         tf.RandomHorizontalFlip(),
@@ -150,15 +150,15 @@ if __name__ == '__main__':
         train_accuracy, epoch_loss = train_epoch(epoch, train_loader, model, loss_fn)
         scheduler.step()
         valid_accuracy, valid_loss = valid_epoch(epoch, valid_loader, model, loss_fn)
-        wandb.log(
-            {
-                'train_loss': epoch_loss,
-                'train_accuracy': train_accuracy,
-                'valid_loss': valid_loss,
-                'valid_accuracy': valid_accuracy,
-                'lr': optimizer.state_dict()['param_groups'][0]['lr']
-            }
-        )
+        # wandb.log(
+        #     {
+        #         'train_loss': epoch_loss,
+        #         'train_accuracy': train_accuracy,
+        #         'valid_loss': valid_loss,
+        #         'valid_accuracy': valid_accuracy,
+        #         'lr': optimizer.state_dict()['param_groups'][0]['lr']
+        #     }
+        # )
 
         if epoch_loss < min_loss:
             min_loss = epoch_loss

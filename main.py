@@ -93,6 +93,11 @@ def freeze_model(model):
         param.requires_grad = False
     return model
 
+def unfreeze_model(model):
+    for param in model.parameters():
+        param.requires_grad = True
+    return model
+
 
 if __name__ == '__main__':
     args = parse_opt()
@@ -147,6 +152,8 @@ if __name__ == '__main__':
                               drop_last=False)
 
     for epoch in tqdm(range(1, epoch_num + 1), position=0):
+        if args.freeze and epoch == epoch_num // 2 :
+            model = unfreeze_model(model)
         train_accuracy, epoch_loss = train_epoch(epoch, train_loader, model, loss_fn)
         scheduler.step()
         valid_accuracy, valid_loss = valid_epoch(epoch, valid_loader, model, loss_fn)

@@ -17,7 +17,7 @@ from torch import nn
 TIMESTAMP = "{0:%Y-%m-%dT%H-%M-%S/}".format(datetime.now())
 
 api_key = '00f7f722b448e3badcd722a4d7d9f54a4493af68'
-wandb.login(key=api_key)
+# wandb.login(key=api_key)
 
 
 def train_epoch(epoch, dataloader, model, loss_fn):
@@ -55,8 +55,8 @@ def valid_epoch(epoch, dataloader, model, loss_fn):
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--image_folder',
-                        default=r'D:\Study\fly\paper_code\fgvc-aircraft-2013b.tar\fgvc-aircraft-2013b\data\images')
-    parser.add_argument('--init_csv', default=r'D:\Study\fly\paper_code\SPC\all_df3.csv')
+                        default=r'D:\Study\fly\experiments\crowl_ps_using\images_origin_remove_duplicate')
+    parser.add_argument('--init_csv', default='init2000.csv')
     parser.add_argument('--epoch', default=30, type=int)
     parser.add_argument('--t_batch', default=64, type=int)
     parser.add_argument('--v_batch', default=64, type=int)
@@ -73,7 +73,8 @@ def parse_opt():
     parser.add_argument('--freeze', default=True)
     parser.add_argument('--model_mode', default=0, type=int)
     parser.add_argument('--account', type=str)
-    parser.add_argument('--image_folder_type', default=0, type=int)
+    parser.add_argument('--image_folder_type', default=1, type=int)
+
 
     args = parser.parse_args()
     return args
@@ -105,8 +106,8 @@ def unfreeze_model(model):
 
 if __name__ == '__main__':
     args = parse_opt()
-    wandb.init(project='SPC', config=vars(args))
-    wandb.run.name = f"epoch:{args.epoch}_trainb_{args.t_batch}_validb_{args.v_batch}_lr_{args.lr}_scheduler_{args.scheduler}+_account{args.account}"
+    # wandb.init(project='SPC', config=vars(args))
+    # wandb.run.name = f"finetune_epoch:{args.epoch}_trainb_{args.t_batch}_validb_{args.v_batch}_lr_{args.lr}_scheduler_{args.scheduler}+_{args.account}"
     train_transform = tf.Compose([
         tf.RandomResizedCrop(args.image_size),
         tf.RandomHorizontalFlip(),

@@ -75,6 +75,7 @@ def parse_opt():
     parser.add_argument('--account', type=str)
     parser.add_argument('--image_folder_type', default=1, type=int)
     parser.add_argument('--finetune_mode', default=0, type=int)
+    parser.add_argument('--funetune_model', default='test_models/model_58_0.7954.pth', type=str)
 
 
     args = parser.parse_args()
@@ -138,7 +139,7 @@ if __name__ == '__main__':
         model = freeze_model(model)
 
     if args.model_mode == 0:
-        model.fc = torch.nn.Linear(model.fc.in_features, len(train_data.classes))
+        model.fc = torch.nn.Linear(model.fc.in_features, 70)
     elif args.model_mode == 1:
         model.fc = torch.nn.Sequential(
             nn.Linear(model.fc.in_features, 256),
@@ -147,7 +148,9 @@ if __name__ == '__main__':
             nn.Linear(256, len(train_data.classes)),
             nn.LogSoftmax(dim=1)
         )
+    model = torch.load('test_models/model_58_0.7954.pth')
     model = model.cuda()
+
 
     if args.finetune_mode == 0:
         for parameters in model.parameters():

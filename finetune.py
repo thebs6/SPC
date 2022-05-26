@@ -74,6 +74,7 @@ def parse_opt():
     parser.add_argument('--model_mode', default=0, type=int)
     parser.add_argument('--account', type=str)
     parser.add_argument('--image_folder_type', default=1, type=int)
+    parser.add_argument('--finetune_mode', default=0, type=int)
 
 
     args = parser.parse_args()

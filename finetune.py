@@ -138,17 +138,19 @@ if __name__ == '__main__':
     if args.freeze:
         model = freeze_model(model)
 
+    model.fc = torch.nn.Linear(model.fc.in_features, 70)
+    model = torch.load(args.funetune_model)
+
     if args.model_mode == 0:
-        model.fc = torch.nn.Linear(model.fc.in_features, 70)
+        pass
     elif args.model_mode == 1:
         model.fc = torch.nn.Sequential(
             nn.Linear(model.fc.in_features, 256),
             nn.ReLU(),
             nn.Dropout(0.4),
-            nn.Linear(256, len(train_data.classes)),
+            nn.Linear(256, 70),
             nn.LogSoftmax(dim=1)
         )
-    model = torch.load('test_models/model_58_0.7954.pth')
     model = model.cuda()
 
 

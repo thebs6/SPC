@@ -17,7 +17,7 @@ from torch import nn
 TIMESTAMP = "{0:%Y-%m-%dT%H-%M-%S/}".format(datetime.now())
 
 api_key = '00f7f722b448e3badcd722a4d7d9f54a4493af68'
-# wandb.login(key=api_key)
+wandb.login(key=api_key)
 
 
 def train_epoch(epoch, dataloader, model, loss_fn):
@@ -106,8 +106,8 @@ def unfreeze_model(model):
 
 if __name__ == '__main__':
     args = parse_opt()
-    # wandb.init(project='SPC', config=vars(args))
-    # wandb.run.name = f"finetune_epoch:{args.epoch}_trainb_{args.t_batch}_validb_{args.v_batch}_lr_{args.lr}_scheduler_{args.scheduler}+_{args.account}"
+    wandb.init(project='SPC', config=vars(args))
+    wandb.run.name = f"finetune_epoch:{args.epoch}_trainb_{args.t_batch}_validb_{args.v_batch}_lr_{args.lr}_scheduler_{args.scheduler}+_{args.account}"
     train_transform = tf.Compose([
         tf.RandomResizedCrop(args.image_size),
         tf.RandomHorizontalFlip(),

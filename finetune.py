@@ -61,7 +61,7 @@ def parse_opt():
     parser.add_argument('--t_batch', default=64, type=int)
     parser.add_argument('--v_batch', default=64, type=int)
     parser.add_argument('--image_size', default=224, type=int)
-    parser.add_argument('--lr', default=0.01, type=float)
+    parser.add_argument('--lr', default=0.001, type=float)
     parser.add_argument('--model_folder', default='./model')
     parser.add_argument('--workers', default=0, type=int)
     parser.add_argument('--scheduler', default='StepLR')
@@ -69,7 +69,7 @@ def parse_opt():
     parser.add_argument('--T_max', default=20)
     parser.add_argument('--model', default='resnet18')
     parser.add_argument('--pretrain', default=False)
-    parser.add_argument('--optimizer', default='SGD')
+    parser.add_argument('--optimizer', default='Adam')
     parser.add_argument('--freeze', default=True)
     parser.add_argument('--model_mode', default=0, type=int)
     parser.add_argument('--account', type=str)
@@ -147,6 +147,15 @@ if __name__ == '__main__':
             nn.LogSoftmax(dim=1)
         )
     model = model.cuda()
+
+    if args.finetune_mode == 0:
+        for parameters in model.parameters():
+            parameters.requires_grad = False
+
+        for parameters in model.fc.parameters():
+            parameters.requires_grad = True
+
+
     loss_fn = CrossEntropyLoss()
     if args.optimizer == 'SGD':
         optimizer = torch.optim.SGD(model.parameters(), lr=learn_rate)
